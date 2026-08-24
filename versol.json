@@ -1,21 +1,18 @@
 {
-  "services": {
-    "my_frontend": {
-      "root": "frontend/"
-    },
-    "my_backend": {
-      "root": "backend/",
-      "entrypoint": "src/index.js"
-    }
-  },
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "dist",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "vite",
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": { "service": "my_backend" }
-    },
-    {
       "source": "/(.*)",
-      "destination": { "service": "my_frontend" }
+      "destination": "/index.html"
     }
-  ]
+  ],
+  "env": {
+    "VITE_API_URL": "https://stay-deck-backend.onrender.com/api",
+    "VITE_WS_URL": "wss://stay-deck-backend.onrender.com",
+    "VITE_QR_BASE_URL": "https://staydeck-frontend.vercel.app/guest"
+  }
 }
