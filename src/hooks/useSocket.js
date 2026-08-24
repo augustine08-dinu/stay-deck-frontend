@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 
-const WS_URL = import.meta.env.VITE_WS_URL || 'http://localhost:5000';
+const WS_URL = import.meta.env.VITE_WS_URL || 'wss://stay-deck-backend.onrender.com';
 
 export const useSocket = (room, type = 'property') => {
   const [socket, setSocket] = useState(null);
