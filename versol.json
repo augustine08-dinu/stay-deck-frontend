@@ -11,6 +11,12 @@
       "destination": "/index.html"
     }
   ],
+  "routes": [
+    {
+      "src": "/[^.]+",
+      "dest": "/index.html"
+    }
+  ],
   "env": {
     "VITE_API_URL": "https://stay-deck-backend.onrender.com/api",
     "VITE_WS_URL": "wss://stay-deck-backend.onrender.com",
