@@ -124,7 +124,7 @@ export default function Rooms() {
   ];
 
   const qrUrl = showQRModal 
-    ? `${import.meta.env.VITE_QR_BASE_URL || 'http://localhost:5173/guest'}/${propertyId}/${showQRModal.room_number}`
+    ? `${import.meta.env.VITE_QR_BASE_URL || 'https://staydeckgoa.vercel.app/guest'}/${propertyId}/${showQRModal.room_number}`
     : '';
 
   if (loading) {
