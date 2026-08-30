@@ -119,10 +119,7 @@ export default function Login() {
           </Link>
         </div>
 
-        <div className="mt-4 p-3 bg-gray-100 rounded-lg text-xs text-gray-500 text-center">
-          <p>🔐 Each user gets their own private admin dashboard</p>
-          <p className="mt-1">Manage your properties, rooms, and guest requests</p>
-        </div>
+        
       </div>
     </div>
   );
