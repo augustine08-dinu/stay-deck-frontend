@@ -3,6 +3,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { propertyService } from '../../services/propertyService';
 import { requestService } from '../../services/requestService';
 import { useSocket } from '../../hooks/useSocket';
+import toast from 'react-hot-toast';
+import { notifyNewRequest, notifyUrgentRequest, testSound } from '../../services/notificationSound';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -11,9 +13,16 @@ export default function Dashboard() {
   const [recentRequests, setRecentRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProperty, setSelectedProperty] = useState(null);
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    const saved = localStorage.getItem('soundEnabled');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
 
-  // Socket for real-time updates
   const { socket } = useSocket(selectedProperty, 'property');
+
+  useEffect(() => {
+    localStorage.setItem('soundEnabled', JSON.stringify(soundEnabled));
+  }, [soundEnabled]);
 
   useEffect(() => {
     fetchData();
@@ -30,7 +39,21 @@ export default function Dashboard() {
     if (socket) {
       socket.on('new-request', (request) => {
         setRecentRequests(prev => [request, ...prev.slice(0, 9)]);
-        // Update stats
+
+        if (soundEnabled) {
+          if (request.priority === 'urgent' || request.priority === 'high') {
+            notifyUrgentRequest(request);
+          } else {
+            notifyNewRequest(request);
+          }
+        }
+
+        if (request.priority === 'urgent') {
+          toast.error(`🔴 URGENT: ${request.request_type} from Room ${request.room_number}`);
+        } else {
+          toast.success(`🆕 New ${request.request_type} from Room ${request.room_number}`);
+        }
+
         if (selectedProperty) {
           fetchStats(selectedProperty);
         }
@@ -40,7 +63,7 @@ export default function Dashboard() {
         socket.off('new-request');
       };
     }
-  }, [socket, selectedProperty]);
+  }, [socket, selectedProperty, soundEnabled]);
 
   const fetchData = async () => {
     try {
@@ -74,6 +97,12 @@ export default function Dashboard() {
     }
   };
 
+  const handleTestSound = async () => {
+    toast.info('🔊 Testing notification sound...');
+    await testSound();
+    setTimeout(() => toast.success('✅ Sound played!'), 1000);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -90,7 +119,7 @@ export default function Dashboard() {
           <p className="text-gray-600 mb-6">
             You haven't created any properties yet. Get started by adding your first property.
           </p>
-          <button 
+          <button
             onClick={() => window.location.href = '/admin/properties'}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
           >
@@ -111,8 +140,8 @@ export default function Dashboard() {
 
   return (
     <div className="container mx-auto p-6">
-      {/* Property Selector */}
-      <div className="mb-6">
+      {/* Top Bar with Property Selector and Sound Controls */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <select
           value={selectedProperty || ''}
           onChange={(e) => setSelectedProperty(e.target.value)}
@@ -122,6 +151,27 @@ export default function Dashboard() {
             <option key={prop.id} value={prop.id}>{prop.name}</option>
           ))}
         </select>
+
+        {/* Sound Controls */}
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 bg-white rounded-lg shadow px-3 py-2">
+            <span className="text-sm font-medium text-gray-700">
+              {soundEnabled ? '🔔 Sound ON' : '🔕 Sound OFF'}
+            </span>
+            <button
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                soundEnabled ? 'bg-blue-600' : 'bg-gray-300'
+              }`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  soundEnabled ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -148,18 +198,42 @@ export default function Dashboard() {
 
       {/* Recent Requests */}
       <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b">
+        <div className="p-6 border-b flex justify-between items-center">
           <h3 className="text-lg font-semibold">Recent Activity</h3>
+          <span className="text-sm text-gray-500">
+            {recentRequests.length} recent {recentRequests.length === 1 ? 'request' : 'requests'}
+          </span>
         </div>
         <div className="divide-y">
           {recentRequests.length === 0 ? (
             <div className="p-6 text-center text-gray-500">No recent requests</div>
           ) : (
             recentRequests.map(request => (
-              <div key={request.id} className="p-4 hover:bg-gray-50">
+              <div
+                key={request.id}
+                className={`p-4 transition-colors ${
+                  request.priority === 'urgent'
+                    ? 'bg-red-50 hover:bg-red-100'
+                    : request.priority === 'high'
+                    ? 'bg-orange-50 hover:bg-orange-100'
+                    : 'hover:bg-gray-50'
+                }`}
+              >
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="font-medium">Room {request.room_number}</div>
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium">Room {request.room_number}</span>
+                      {request.priority === 'urgent' && (
+                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-500 text-white animate-pulse">
+                          🔴 URGENT
+                        </span>
+                      )}
+                      {request.priority === 'high' && (
+                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-500 text-white">
+                          ⚠️ HIGH
+                        </span>
+                      )}
+                    </div>
                     <div className="text-sm text-gray-600">
                       {request.request_type} - {request.description || 'No description'}
                     </div>
