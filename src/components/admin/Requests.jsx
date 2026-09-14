@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+mport React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { requestService } from '../../services/requestService';
 import { roomService } from '../../services/roomService';
@@ -6,7 +6,6 @@ import { useSocket } from '../../hooks/useSocket';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import toast from 'react-hot-toast';
-import { notifyNewRequest, notifyUrgentRequest, testSound } from '../../services/notificationSound';
 
 export default function Requests() {
   const { selectedProperty } = useOutletContext();
@@ -18,10 +17,6 @@ export default function Requests() {
   const [rooms, setRooms] = useState([]);
   const [filterStatus, setFilterStatus] = useState('all');
   const [sortOrder, setSortOrder] = useState('newest');
-  const [soundEnabled, setSoundEnabled] = useState(() => {
-    const saved = localStorage.getItem('soundEnabled');
-    return saved !== null ? JSON.parse(saved) : true;
-  });
   const [formData, setFormData] = useState({
     request_type: 'cleaning',
     description: '',
@@ -35,10 +30,6 @@ export default function Requests() {
   const { socket, isConnected } = useSocket(selectedProperty, 'property');
 
   useEffect(() => {
-    localStorage.setItem('soundEnabled', JSON.stringify(soundEnabled));
-  }, [soundEnabled]);
-
-  useEffect(() => {
     if (selectedProperty) {
       fetchData();
       fetchRooms();
@@ -49,21 +40,7 @@ export default function Requests() {
     if (socket) {
       socket.on('new-request', (request) => {
         setRequests(prev => [request, ...prev]);
-
-        if (soundEnabled) {
-          if (request.priority === 'urgent' || request.priority === 'high') {
-            notifyUrgentRequest(request);
-          } else {
-            notifyNewRequest(request);
-          }
-        }
-
-        if (request.priority === 'urgent') {
-          toast.error(`🔴 URGENT: ${request.request_type} request from Room ${request.room_number}`);
-        } else {
-          toast.success(`New ${request.request_type} request from Room ${request.room_number}`);
-        }
-
+        toast.success(`New ${request.request_type} request from Room ${request.room_number}`);
         fetchStats();
       });
 
@@ -81,7 +58,7 @@ export default function Requests() {
         socket.off('request-updated');
       };
     }
-  }, [socket, soundEnabled]);
+  }, [socket]);
 
   const fetchData = async () => {
     try {
@@ -174,12 +151,6 @@ export default function Requests() {
       console.error('Error adding request:', error);
       toast.error(error.response?.data?.error || 'Failed to add request');
     }
-  };
-
-  const handleTestSound = async () => {
-    toast.info('🔊 Testing notification sound...');
-    await testSound();
-    setTimeout(() => toast.success('✅ Sound played!'), 1000);
   };
 
   const getStatusColor = (status) => {
@@ -308,33 +279,6 @@ export default function Requests() {
               </div>
             </div>
 
-            {/* Sound Controls */}
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">
-                  {soundEnabled ? '🔔 Sound Alerts: ON' : '🔕 Sound Alerts: OFF'}
-                </span>
-                <button
-                  onClick={() => setSoundEnabled(!soundEnabled)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    soundEnabled ? 'bg-blue-600' : 'bg-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      soundEnabled ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-              <button
-                onClick={handleTestSound}
-                className="w-full text-sm bg-purple-50 text-purple-600 hover:bg-purple-100 py-2 rounded-lg transition-colors"
-              >
-                🔊 Test Sound
-              </button>
-            </div>
-
             {!isConnected && (
               <div className="mt-3 text-sm text-yellow-600">
                 ⚠️ Realtime updates disconnected. Reconnecting...
@@ -397,13 +341,7 @@ export default function Requests() {
                 {allRequests.map(request => (
                   <div
                     key={request.id}
-                    className={`flex items-center justify-between p-4 rounded-lg border transition-colors ${
-                      request.priority === 'urgent'
-                        ? 'bg-red-50 border-red-300 hover:bg-red-100'
-                        : request.priority === 'high'
-                        ? 'bg-orange-50 border-orange-200 hover:bg-orange-100'
-                        : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
-                    }`}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 border border-gray-200 transition-colors"
                   >
                     <div className="flex-1">
                       <div className="flex items-center space-x-3">
@@ -417,13 +355,13 @@ export default function Requests() {
                               {request.status}
                             </span>
                             {request.priority === 'urgent' && (
-                              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-500 text-white animate-pulse">
-                                🔴 URGENT
+                              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                🔴 Urgent
                               </span>
                             )}
                             {request.priority === 'high' && (
-                              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-500 text-white">
-                                ⚠️ HIGH
+                              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                ⚠️ High
                               </span>
                             )}
                           </div>
