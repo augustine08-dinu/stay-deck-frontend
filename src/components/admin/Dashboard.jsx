@@ -3,6 +3,52 @@ import { useAuth } from '../../hooks/useAuth';
 import { propertyService } from '../../services/propertyService';
 import { requestService } from '../../services/requestService';
 import { useSocket } from '../../hooks/useSocket';
+import { testSound } from '../../services/notificationSound';
+import toast from 'react-hot-toast';
+
+export default function Dashboard() {
+  const { user } = useAuth();
+  const [properties, setProperties] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [recentRequests, setRecentRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedProperty, setSelectedProperty] = useState(null);
+
+  // ... existing code ...
+
+  const testNotificationSound = async () => {
+    toast.info('🔊 Testing notification sound...');
+    await testSound();
+    toast.success('✅ Sound played!');
+  };
+
+  return (
+    <div className="container mx-auto p-6">
+      {/* Test Sound Button */}
+      <div className="mb-4 flex justify-end">
+        <button
+          onClick={testNotificationSound}
+          className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+        >
+          🔊 Test Sound
+        </button>
+      </div>
+      
+      {/* Rest of your dashboard */}
+      {/* ... */}
+    </div>
+  );
+}
+
+
+
+
+
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import { propertyService } from '../../services/propertyService';
+import { requestService } from '../../services/requestService';
+import { useSocket } from '../../hooks/useSocket';
 
 export default function Dashboard() {
   const { user } = useAuth();
