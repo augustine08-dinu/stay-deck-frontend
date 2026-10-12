@@ -99,7 +99,7 @@ export default function Feedback() {
           </div>
           <div className="bg-white rounded-lg shadow p-4 text-center">
             <div className={`text-2xl font-bold ${getRatingColor(Math.round(stats.avg_overall || 0))}`}>
-              {stats.avg_overall ? stats.avg_overall.toFixed(1) : 'N/A'}
+              {stats.avg_overall ? Number(stats.avg_overall).toFixed(1) : 'N/A'}
             </div>
             <div className="text-sm text-gray-500">Average Rating</div>
           </div>
@@ -122,15 +122,15 @@ export default function Feedback() {
             <div className="space-y-2">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Cleanliness</span>
-                <span className="font-medium">{stats.avg_cleanliness?.toFixed(1) || 'N/A'}</span>
+                <span className="font-medium">{stats.avg_cleanliness ? Number(stats.avg_cleanliness).toFixed(1) : 'N/A'}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Staff</span>
-                <span className="font-medium">{stats.avg_staff?.toFixed(1) || 'N/A'}</span>
+                <span className="font-medium">{stats.avg_staff ? Number(stats.avg_staff).toFixed(1) : 'N/A'}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Service</span>
-                <span className="font-medium">{stats.avg_service?.toFixed(1) || 'N/A'}</span>
+                <span className="font-medium">{stats.avg_service ? Number(stats.avg_service).toFixed(1) : 'N/A'}</span>
               </div>
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Room Comfort</span>
