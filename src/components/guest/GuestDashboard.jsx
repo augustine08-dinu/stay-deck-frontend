@@ -111,12 +111,12 @@ export default function GuestDashboard() {
         <h3 className="text-lg font-semibold text-gray-800 mb-3">🛎️ What do you need?</h3>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
           {[
-            { id: 'cleaning', icon: '🧹', label: 'Cleaning' },
-            { id: 'towels', icon: '🛏️', label: 'Towels' },
-            { id: 'toiletries', icon: '🧴', label: 'Toiletries' },
-            { id: 'water', icon: '💧', label: 'Water' },
-            { id: 'maintenance', icon: '🔧', label: 'Maintenance' },
-            { id: 'other', icon: '🛎️', label: 'Other' }
+            { id: 'cleaning',  label: 'Cleaning' },
+            { id: 'towels', label: 'Towels' },
+            { id: 'toiletries', label: 'Toiletries' },
+            { id: 'water',  label: 'Water' },
+            { id: 'maintenance', label: 'Maintenance' },
+            { id: 'other',  label: 'Other' }
           ].map((service) => (
             <button
               key={service.id}
