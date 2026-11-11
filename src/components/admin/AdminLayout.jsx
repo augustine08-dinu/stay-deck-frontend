@@ -46,10 +46,10 @@ export default function AdminLayout() {
   }
 
   const navigation = [
-    { name: 'Dashboard', href: '/admin', icon: '📊' },
-    { name: 'Properties', href: '/admin/properties', icon: '🏢' },
-    { name: 'Requests', href: '/admin/requests', icon: '📋' },
-    { name: 'Feedback', href: '/admin/feedback', icon: '⭐' },
+    { name: 'Dashboard', href: '/admin' },
+    { name: 'Properties', href: '/admin/properties' },
+    { name: 'Requests', href: '/admin/requests' },
+    { name: 'Feedback', href: '/admin/feedback' },
   ];
 
   const isActive = (path) => location.pathname === path;
