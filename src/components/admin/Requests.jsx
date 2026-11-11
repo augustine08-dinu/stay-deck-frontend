@@ -193,18 +193,6 @@ export default function Requests() {
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
-  const getRequestTypeIcon = (type) => {
-    const icons = {
-      cleaning: '🧹',
-      towels: '🛏️',
-      toiletries: '🧴',
-      water: '💧',
-      maintenance: '🔧',
-      other: '🛎️'
-    };
-    return icons[type] || '📋';
-  };
-
   const getTileClassName = ({ date }) => {
     const dateStr = date.toISOString().split('T')[0];
     const dayRequests = requests.filter(req => req.requested_date === dateStr);
@@ -406,8 +394,8 @@ export default function Requests() {
                     }`}
                   >
                     <div className="flex-1">
-                      <div className="flex items-center space-x-3">
-                        <span className="text-2xl">{getRequestTypeIcon(request.request_type)}</span>
+                      <div className="flex items-center">
+                        
                         <div>
                           <div className="flex items-center space-x-2 flex-wrap">
                             <span className="font-semibold text-gray-900">
